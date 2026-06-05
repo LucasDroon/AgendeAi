@@ -18,7 +18,7 @@ public class VendaProdutosModel {
 
     // Relacionamentos -------
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_usuario")
     private UsuariosModel usuariosModel;
 
@@ -26,12 +26,19 @@ public class VendaProdutosModel {
     @JoinColumn(name = "id_cliente")
     private ClientesModel clientesModel;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_agendamento")
+    private AgendamentosModel agendamentosModel;
+
     // Demais campos -------
 
-    @Column(name = "data_hora")
-    private LocalDateTime data_hora;
+    @Column(name = "cliente_avulso_nome", length = 100)
+    private String cliente_avulso_nome;
 
-    @Column(name = "valor_total")
-    private Double valor_total;
+    @Column(name = "data_hora", nullable = false)
+    private LocalDateTime data_hora = LocalDateTime.now();
+
+    @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
+    private java.math.BigDecimal valor_total;
 
 }

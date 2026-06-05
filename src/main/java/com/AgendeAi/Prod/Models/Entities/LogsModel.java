@@ -36,8 +36,14 @@ public class LogsModel {
     @Column(name = "acao")
     private String acao;
 
+    @Column(name = "tabela_afetada")
+    private String tabela_afetada;
+
+    @Column(name = "registro_id")
+    private Integer registro_id;
+
     @Column(name = "data_hora")
-    private LocalDateTime data_hora;
+    private LocalDateTime data_hora = LocalDateTime.now();
 
     @Column(name = "descricao")
     private String descricao;

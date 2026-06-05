@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Table(name = ProdutosModel.TABLE_NAME)
@@ -20,15 +22,14 @@ public class ProdutosModel {
     @Column(name = "id_produto", unique = true)
     private Integer id_produto;
 
+    // Demais campos -------
+
     @Column(name = "nome")
     private String nome;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", nullable = false, columnDefinition = "text")
     private String descricao;
 
     @Column(name = "preco_venda")
-    private Double preco_venda;
-
-    @Column(name = "estoque_atual")
-    private Integer estoque_atual;
+    private BigDecimal preco_venda;
 }

@@ -8,7 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -19,17 +20,25 @@ public class ClientesModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cliente")
+    @Column(name = "id_cliente", unique = true)
     private Integer id_cliente;
 
-    @Column(name = "nome")
+    // Demais campos -------
+
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "telefone")
+    @Column(name = "telefone", nullable = false, unique = true, length = 15)
     private String telefone;
 
-    @Column(name = "data_nascimento")
-    private Date data_nascimento;
+    @Column(name = "data_nascimento", nullable = false)
+    private LocalDate data_nascimento;
+
+    @Column(name = "data_cadastro", nullable = false)
+    private LocalDateTime data_cadastro = LocalDateTime.now();
+
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = true;
 
 
 

@@ -25,21 +25,21 @@ public class UsuariosModel {
 
     // Relacionamentos -------
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "id_perfil")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_perfil", nullable = false)
     private PerfisModel perfisModel;
 
-    // Demais colunas -------
+    // Demais campos -------
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "senha_hash")
+    @Column(name = "senha_hash", nullable = false, length = 255)
     private String senha_hash;
 
-    @Column(name = "status")
-    private boolean status;
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = true;
 }

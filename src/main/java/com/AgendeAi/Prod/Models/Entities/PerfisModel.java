@@ -20,7 +20,9 @@ public class PerfisModel {
     @Column(name = "id_perfil", unique = true)
     private Integer id_perfil;
 
-    @Column(name = "nome_perfil")
+    // Demais campos -------
+
+    @Column(name = "nome_perfil", nullable = false, length = 30)
     private String nome_perfil;
 
 }

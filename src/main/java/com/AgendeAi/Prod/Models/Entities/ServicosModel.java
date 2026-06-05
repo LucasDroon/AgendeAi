@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import lombok.Data;
 
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Table(name = ServicosModel.TABLE_NAME)
@@ -21,12 +23,17 @@ public class ServicosModel {
     @Column(name = "id_servico", unique = true)
     private Integer id_servico;
 
-    @Column(name = "nome")
+    // Demais campos -------
+
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "preco")
-    private Double preco;
+    @Column(name = "preco", nullable = false, precision = 10, scale = 2)
+    private BigDecimal preco;
 
-    @Column(name = "duracao_estimada")
+    @Column(name = "duracao_estimada", nullable = false)
     private Integer duracao_estimada;
+
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = true;
 }

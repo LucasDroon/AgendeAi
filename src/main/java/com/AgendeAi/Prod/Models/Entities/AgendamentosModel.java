@@ -11,6 +11,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import lombok.Data;
 
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -27,7 +30,7 @@ public class AgendamentosModel {
 
     // Relacionamentos -------
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_cliente")
     private ClientesModel clientesModel;
 
@@ -35,26 +38,27 @@ public class AgendamentosModel {
     @JoinColumn(name = "id_profissional")
     private ProfissionaisModel profissionaisModel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_servico")
     private ServicosModel servicosModel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_usuario")
     private UsuariosModel usuariosModel;
 
-    // Demais campos --------
+    // Demais campos -------
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora", nullable = false)
     private LocalDateTime data_hora;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatusAgendamento status;
 
-    @Column(name = "valor_pago")
-    private Double valor_pago;
+    @Column(name = "valor_pago", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valor_pago;
 
-    @Column(name = "valor_comissao_gerada")
-    private Double valor_comissao_gerada;
+    @Column(name = "valor_comissao_gerada", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valor_comissao_gerada;
 
 }
