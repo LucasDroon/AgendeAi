@@ -1,4 +1,4 @@
-package com.AgendeAi.Prod.Config;
+package com.AgendeAi.Prod.config;
 
 import com.AgendeAi.Prod.Repositories.UsuariosRepository;
 import com.AgendeAi.Prod.Services.TokenService;
