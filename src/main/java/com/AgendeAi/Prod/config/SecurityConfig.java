@@ -33,19 +33,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Autenticação Pública
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/usuarios").hasRole("ADMIN")
 
-                        // Exclusivos do Admin
+                        .requestMatchers(HttpMethod.POST, "/usuarios").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/clientes/**", "/profissionais/**", "/servicos/**", "/agendamentos/**").hasRole("ADMIN")
                         .requestMatchers("/clientes/**", "/profissionais/**", "/servicos/**", "/agendamentos/**").hasRole("ADMIN")
+
                         .requestMatchers("/dashboard", "/relatorios", "/caixa").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/agenda").hasRole("ADMIN")
 
-                        // Exclusivos do Profissional
                         .requestMatchers(HttpMethod.POST, "/totem/atendimentos").hasRole("PROFISSIONAL")
 
-                        // Leitura Pública Autenticada (Ambos acessam)
                         .requestMatchers(HttpMethod.GET, "/totem/servicos").hasAnyRole("ADMIN", "PROFISSIONAL")
 
                         .anyRequest().authenticated()
