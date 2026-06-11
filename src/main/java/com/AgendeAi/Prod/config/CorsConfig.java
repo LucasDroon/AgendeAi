@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Aplica para todas as rotas da API
-                .allowedOrigins("http://localhost:5173", "https://agende-ai-front.vercel.app/")
+                .allowedOrigins("http://localhost:5173", "https://agende-ai-front.vercel.app/, https://agende-ai-front.vercel.app")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
