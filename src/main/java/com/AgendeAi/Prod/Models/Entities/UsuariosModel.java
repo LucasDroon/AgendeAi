@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import lombok.Data;
 
+import lombok.ToString;
+
 @Data
 @Entity
 @Table(name = UsuariosModel.TABLE_NAME)
@@ -25,6 +27,7 @@ public class UsuariosModel {
 
     // Relacionamentos -------
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_perfil", nullable = false)
     private PerfisModel perfisModel;

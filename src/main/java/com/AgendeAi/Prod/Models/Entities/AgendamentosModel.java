@@ -13,6 +13,9 @@ import lombok.Data;
 
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -52,7 +55,8 @@ public class AgendamentosModel {
     private LocalDateTime data_hora;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", nullable = false, columnDefinition = "status_agendamento")
     private StatusAgendamento status;
 
     @Column(name = "valor_pago", nullable = false, precision = 10, scale = 2)
