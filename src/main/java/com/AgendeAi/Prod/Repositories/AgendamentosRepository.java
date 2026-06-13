@@ -9,8 +9,13 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 @Repository
 public interface AgendamentosRepository extends JpaRepository<AgendamentosModel, Integer> {
+
+    @EntityGraph(attributePaths = {"clientesModel", "profissionaisModel", "servicosModel", "usuariosModel"})
+    List<AgendamentosModel> findAll();
 
     // Busca agendamentos de um profissional específico
     @Query("SELECT a FROM AgendamentosModel a WHERE a.profissionaisModel.id_profissional = :idProfissional")

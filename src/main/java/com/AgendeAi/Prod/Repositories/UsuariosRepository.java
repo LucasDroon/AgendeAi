@@ -6,7 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 @Repository
 public interface UsuariosRepository extends JpaRepository<UsuariosModel, Integer> {
-    Optional<UsuariosModel> findByEmail(String email);
+    @Query("SELECT u FROM UsuariosModel u JOIN FETCH u.perfisModel WHERE u.email = :email")
+    Optional<UsuariosModel> findByEmail(@Param("email") String email);
 }
