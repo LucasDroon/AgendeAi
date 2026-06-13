@@ -1,5 +1,6 @@
 package com.AgendeAi.Prod.Controllers;
 
+import com.AgendeAi.Prod.Models.DTOs.AgendamentoResponseDTO;
 import com.AgendeAi.Prod.Models.Entities.AgendamentosModel;
 import com.AgendeAi.Prod.Models.Entities.StatusAgendamento;
 import com.AgendeAi.Prod.Services.AgendamentosService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/agendamentos")
@@ -16,12 +18,6 @@ public class AgendamentosController {
 
     @Autowired
     private AgendamentosService agendamentosService;
-
-    // GET /agendamentos - Listar todos os agendamentos registrados
-    @GetMapping
-    public ResponseEntity<List<AgendamentosModel>> listarTodos() {
-        return ResponseEntity.ok(agendamentosService.listarTodos());
-    }
 
     // POST /agendamentos - Registrar um novo horário na agenda
     @PostMapping
@@ -43,5 +39,40 @@ public class AgendamentosController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Integer id) {
+        try {
+            agendamentosService.atualizarStatus(id, StatusAgendamento.Cancelado);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    // GET /agendamentos - Listar todos os agendamentos registrados
+    @GetMapping
+    public ResponseEntity<List<AgendamentoResponseDTO>> listarTodos() {
+        List<AgendamentosModel> lista = agendamentosService.listarTodos();
+
+        // Converte cada entidade para DTO antes de enviar ao frontend
+        List<AgendamentoResponseDTO> dtos = lista.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
+
+    private AgendamentoResponseDTO toDTO(AgendamentosModel a) {
+        return new AgendamentoResponseDTO(
+                a.getId_agendamento(),
+                a.getClientesModel().getNome(),
+                (a.getProfissionaisModel() != null) ? a.getProfissionaisModel().getNome() : "Sem profissional",
+                a.getServicosModel().getNome(),
+                a.getData_hora(),
+                a.getStatus().name(),
+                a.getValor_pago()
+        );
     }
 }

@@ -60,4 +60,15 @@ public class ProfissionaisController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // DELETE /profissionais/{id} - Inativar profissional (Exclusão lógica)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Integer id) {
+        try {
+            profissionaisService.inativarProfissional(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

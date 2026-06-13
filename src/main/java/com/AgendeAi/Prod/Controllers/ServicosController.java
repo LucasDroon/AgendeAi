@@ -60,4 +60,15 @@ public class ServicosController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // DELETE /servicos/{id} - Inativar serviço (Exclusão lógica)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Integer id) {
+        try {
+            servicosService.inativarServico(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
