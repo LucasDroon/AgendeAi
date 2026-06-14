@@ -1,5 +1,6 @@
 package com.AgendeAi.Prod.Controllers;
 
+import com.AgendeAi.Prod.Models.DTOs.AgendamentoRequestDTO;
 import com.AgendeAi.Prod.Models.DTOs.AgendamentoResponseDTO;
 import com.AgendeAi.Prod.Models.Entities.AgendamentosModel;
 import com.AgendeAi.Prod.Models.Entities.StatusAgendamento;
@@ -21,10 +22,10 @@ public class AgendamentosController {
 
     // POST /agendamentos - Registrar um novo horário na agenda
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody AgendamentosModel agendamento) {
+    public ResponseEntity<?> criar(@RequestBody AgendamentoRequestDTO dto) {
         try {
-            AgendamentosModel novoAgendamento = agendamentosService.criarAgendamento(agendamento);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novoAgendamento);
+            AgendamentosModel novoAgendamento = agendamentosService.criarAgendamento(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(novoAgendamento));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
         }
@@ -35,7 +36,7 @@ public class AgendamentosController {
     public ResponseEntity<?> mudarStatus(@PathVariable Integer id, @RequestParam StatusAgendamento status) {
         try {
             AgendamentosModel atualizado = agendamentosService.atualizarStatus(id, status);
-            return ResponseEntity.ok(atualizado);
+            return ResponseEntity.ok(toDTO(atualizado));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

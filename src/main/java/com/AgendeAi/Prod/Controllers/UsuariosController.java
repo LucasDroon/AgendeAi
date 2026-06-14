@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuariosController {
@@ -19,5 +21,11 @@ public class UsuariosController {
     public ResponseEntity<?> cadastrar(@RequestBody UsuariosModel usuario) {
         UsuariosModel novoUsuario = usuariosService.cadastrarUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
+    }
+
+    // GET /usuarios - Listar todos os usuários
+    @GetMapping
+    public ResponseEntity<List<UsuariosModel>> listarTodos() {
+        return ResponseEntity.ok(usuariosService.listarTodos());
     }
 }

@@ -42,7 +42,13 @@ public class AuthController {
         // Bate a senha vinda do JSON com o Hash no Supabase
         if (passwordEncoder.matches(data.senha(), usuario.getSenha_hash())) {
             String token = tokenService.gerarToken(usuario);
-            return ResponseEntity.ok(new LoginResponseDTO(token));
+            return ResponseEntity.ok(new LoginResponseDTO(
+                token, 
+                usuario.getId_usuario(), 
+                usuario.getNome(), 
+                usuario.getEmail(),
+                usuario.getPerfisModel().getNome_perfil()
+            ));
         }
 
         return ResponseEntity.status(401).body("Credenciais inválidas.");
