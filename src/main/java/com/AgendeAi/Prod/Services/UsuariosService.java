@@ -22,4 +22,8 @@ public class UsuariosService {
         usuario.setSenha_hash(passwordEncoder.encode(usuario.getSenha_hash()));
         return usuariosRepository.save(usuario);
     }
+
+    public java.util.List<UsuariosModel> listarTodos() {
+        return usuariosRepository.findAll();
+    }
 }

@@ -1,9 +1,7 @@
 package com.AgendeAi.Prod.Services;
 
-import com.AgendeAi.Prod.Models.Entities.AgendamentosModel;
-import com.AgendeAi.Prod.Models.Entities.ProfissionaisModel;
-import com.AgendeAi.Prod.Models.Entities.ServicosModel;
-import com.AgendeAi.Prod.Models.Entities.StatusAgendamento;
+import com.AgendeAi.Prod.Models.DTOs.AgendamentoRequestDTO;
+import com.AgendeAi.Prod.Models.Entities.*;
 import com.AgendeAi.Prod.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,7 @@ public class AgendamentosService {
     @Autowired
     private UsuariosRepository usuariosRepository;
 
+    @Transactional(readOnly = true)
     public List<AgendamentosModel> listarTodos() {
         return agendamentosRepository.findAll();
     }
@@ -42,47 +41,49 @@ public class AgendamentosService {
     }
 
     @Transactional
-    public AgendamentosModel criarAgendamento(AgendamentosModel agendamento) {
-        // 1. Validação de data retroativa
-        if (agendamento.getData_hora().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Não é possível realizar um agendamento para uma data e hora passada.");
-        }
-
-        // 2. Validar se o cliente, serviço e usuário existem
-        clientesRepository.findById(agendamento.getClientesModel().getId_cliente())
+    public AgendamentosModel criarAgendamento(AgendamentoRequestDTO dto) {
+        // Converter IDs para Entidades
+        ClientesModel cliente = clientesRepository.findById(dto.id_cliente())
                 .orElseThrow(() -> new IllegalArgumentException("Cliente informado não existe."));
-
-        ServicosModel servico = servicosRepository.findById(agendamento.getServicosModel().getId_servico())
+        
+        ServicosModel servico = servicosRepository.findById(dto.id_servico())
                 .orElseThrow(() -> new IllegalArgumentException("Serviço informado não existe."));
-
-        usuariosRepository.findById(agendamento.getUsuariosModel().getId_usuario())
+        
+        UsuariosModel usuario = usuariosRepository.findById(dto.id_usuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário do sistema informado não existe."));
-
-        // 3. Define o valor pago padrão baseado no preço atual do serviço (se não enviado)
-        if (agendamento.getValor_pago() == null) {
-            agendamento.setValor_pago(servico.getPreco());
-        }
-
-        // 4. Regra de Negócio de Comissão (Se houver profissional atribuído)
-        if (agendamento.getProfissionaisModel() != null && agendamento.getProfissionaisModel().getId_profissional() != null) {
-            ProfissionaisModel profissional = profissionaisRepository.findById(agendamento.getProfissionaisModel().getId_profissional())
+        
+        ProfissionaisModel profissional = null;
+        if (dto.id_profissional() != null) {
+            profissional = profissionaisRepository.findById(dto.id_profissional())
                     .orElseThrow(() -> new IllegalArgumentException("Profissional informado não existe."));
-
-            // valor_comissao = (preco_do_servico * percentual_comissao) / 100
-            BigDecimal percentual = profissional.getPercentual_comissao();
-            BigDecimal comissaoGerada = servico.getPreco()
-                    .multiply(percentual)
-                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-
-            agendamento.setValor_comissao_gerada(comissaoGerada);
-        } else {
-            // Caso seja ordem de chegada / sem profissional definitivo mapeado ainda
-            agendamento.setValor_comissao_gerada(BigDecimal.ZERO);
         }
 
-        // 5. Todo agendamento novo nasce com o status 'Agendado'
-        if (agendamento.getStatus() == null) {
+        LocalDateTime dataHora = LocalDateTime.parse(dto.data_hora());
+        if (dataHora.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Data retroativa.");
+        }
+
+        AgendamentosModel agendamento = new AgendamentosModel();
+        agendamento.setData_hora(dataHora);
+        agendamento.setClientesModel(cliente);
+        agendamento.setServicosModel(servico);
+        agendamento.setUsuariosModel(usuario);
+        agendamento.setProfissionaisModel(profissional);
+        
+        if ("PROFISSIONAL".equalsIgnoreCase(usuario.getPerfisModel().getNome_perfil())) {
+            agendamento.setStatus(StatusAgendamento.Confirmado);
+        } else {
             agendamento.setStatus(StatusAgendamento.Agendado);
+        }
+        
+        agendamento.setValor_pago(servico.getPreco());
+
+        if (profissional != null) {
+            BigDecimal percentual = profissional.getPercentual_comissao();
+            BigDecimal comissao = servico.getPreco().multiply(percentual).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            agendamento.setValor_comissao_gerada(comissao);
+        } else {
+            agendamento.setValor_comissao_gerada(BigDecimal.ZERO);
         }
 
         return agendamentosRepository.save(agendamento);
@@ -95,5 +96,13 @@ public class AgendamentosService {
 
         agendamento.setStatus(novoStatus);
         return agendamentosRepository.save(agendamento);
+    }
+
+    @Transactional
+    public void deletarAgendamento(Integer id) {
+        if (!agendamentosRepository.existsById(id)) {
+            throw new IllegalArgumentException("Agendamento não encontrado.");
+        }
+        agendamentosRepository.deleteById(id);
     }
 }
