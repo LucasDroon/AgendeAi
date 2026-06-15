@@ -9,6 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -58,13 +63,23 @@ public class AgendamentosService {
                     .orElseThrow(() -> new IllegalArgumentException("Profissional informado não existe."));
         }
 
-        LocalDateTime dataHora = LocalDateTime.parse(dto.data_hora());
-        if (dataHora.isBefore(LocalDateTime.now())) {
+        OffsetDateTime dataHoraRequest;
+        try {
+            dataHoraRequest = OffsetDateTime.parse(dto.data_hora());
+        } catch (DateTimeParseException e) {
+            // Se falhar, tenta como LocalDateTime e assume horário de Cuiabá (UTC-4)
+            LocalDateTime localDateTime = LocalDateTime.parse(dto.data_hora());
+            dataHoraRequest = localDateTime.atZone(ZoneId.of("America/Cuiaba")).toOffsetDateTime();
+        }
+
+        ZonedDateTime nowUtc = ZonedDateTime.now(ZoneId.of("UTC"));
+        
+        if (dataHoraRequest.toZonedDateTime().isBefore(nowUtc)) {
             throw new IllegalArgumentException("Data retroativa.");
         }
 
         AgendamentosModel agendamento = new AgendamentosModel();
-        agendamento.setData_hora(dataHora);
+        agendamento.setData_hora(dataHoraRequest.toLocalDateTime());
         agendamento.setClientesModel(cliente);
         agendamento.setServicosModel(servico);
         agendamento.setUsuariosModel(usuario);
